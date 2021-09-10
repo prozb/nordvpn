@@ -219,10 +219,16 @@ trap cleanup SIGTERM SIGINT EXIT # https://www.ctl.io/developers/blog/post/grace
 [[ -n ${RECONNECT} && -z ${CHECK_CONNECTION_INTERVAL} ]] && CHECK_CONNECTION_INTERVAL=${RECONNECT}
 while true; do
   sleep "${CHECK_CONNECTION_INTERVAL:-300}"
-  if [[ ! $(curl -Is -m 30 -o /dev/null -w "%{http_code}" "${CHECK_CONNECTION_URL:-www.google.com}") =~ ^[23] ]]; then
-    echo "[$(date -Iseconds)] Unstable connection detected!"
-    nordvpn status
-    restart_daemon
-    connect
-  fi
+  printf %"$COLUMNS"s |tr " " "-"
+  echo "[$(date -Iseconds)] restarting connection!"
+  nordvpn status
+  restart_daemon
+  connect
+  printf %"$COLUMNS"s |tr " " "-"
+  # if [[ ! $(curl -Is -m 30 -o /dev/null -w "%{http_code}" "${CHECK_CONNECTION_URL:-www.google.com}") =~ ^[23] ]]; then
+  #   echo "[$(date -Iseconds)] Unstable connection detected!"
+  #   nordvpn status
+  #   restart_daemon
+  #   connect
+  # fi
 done
