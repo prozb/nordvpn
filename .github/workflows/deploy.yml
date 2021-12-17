@@ -1,13 +1,13 @@
 name: deploy
 on:
   push:
-    
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2
 
       - name: Get branch name
         id: git
@@ -22,15 +22,15 @@ jobs:
           echo "::set-output name=tag::${TAG}"
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1.2.0
+        uses: docker/setup-qemu-action@v1
         with:
           platforms: amd64,arm64,arm,386
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1.5.1
+        uses: docker/setup-buildx-action@v1
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v1
         with:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/386
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
             ${{ github.repository }}:${{ steps.git.outputs.name }}
@@ -55,14 +55,14 @@ jobs:
         uses: docker/build-push-action@v2
         if: steps.git.outputs.tag == 'true'
         with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/386
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
             ${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:latest
 
       - name: Update repo description
-        uses: peter-evans/dockerhub-description@v2.4.3
+        uses: peter-evans/dockerhub-description@v2
         if: steps.git.outputs.tag == 'true'
         with:
           username: ${{ github.repository_owner }}
