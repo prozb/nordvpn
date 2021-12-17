@@ -10,3 +10,4 @@ echo "Private Key: $(wg show nordlynx private-key)"
 echo "############################################################"
 
 exit 0
+
